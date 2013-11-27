@@ -10,12 +10,17 @@ L.GridLayer = L.Class.extend({
 		tileSize: 256,
 		opacity: 1,
 
-		// minZoom: <Number>,
-		// maxZoom: <Number>,
-
 		unloadInvisibleTiles: L.Browser.mobile,
 		updateWhenIdle: L.Browser.mobile,
 		updateInterval: 150
+
+		/*
+		minZoom: <Number>,
+		maxZoom: <Number>,
+		attribution: <String>,
+		zIndex: <Number>,
+		bounds: <LatLngBounds>
+		*/
 	},
 
 	initialize: function (options) {
@@ -45,7 +50,7 @@ L.GridLayer = L.Class.extend({
 	onRemove: function (map) {
 		this._getPane().removeChild(this._container);
 
-		map.on(this._getEvents(), this);
+		map.off(this._getEvents(), this);
 
 		this._container = null;
 		this._map = null;
@@ -102,7 +107,7 @@ L.GridLayer = L.Class.extend({
 
 	redraw: function () {
 		if (this._map) {
-			this._reset({hard: true}); //TODO wtf hard?
+			this._reset({hard: true});
 			this._update();
 		}
 		return this;
@@ -210,22 +215,10 @@ L.GridLayer = L.Class.extend({
 		if (this._animated && e && e.hard) {
 			this._clearBgBuffer();
 		}
-
-		// this._initContainer();
-		// TODO OK?
 	},
 
 	_getTileSize: function () {
-		var map = this._map,
-		    zoom = map.getZoom() + this.options.zoomOffset,
-		    zoomN = this.options.maxNativeZoom,
-		    tileSize = this.options.tileSize;
-
-		if (zoomN && zoom > zoomN) {
-			tileSize = Math.round(map.getZoomScale(zoom) / map.getZoomScale(zoomN) * tileSize);
-		}
-
-		return tileSize;
+		return this.options.tileSize;
 	},
 
 	_update: function () {
@@ -418,7 +411,10 @@ L.GridLayer = L.Class.extend({
 
 	_tileReady: function (err, tile) {
 		if (err) {
-			this.fire('tileerror', {error: err});
+			this.fire('tileerror', {
+				error: err,
+				tile: tile
+			});
 		}
 
 		L.DomUtil.addClass(tile, 'leaflet-tile-loaded');
