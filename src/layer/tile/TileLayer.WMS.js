@@ -1,5 +1,5 @@
 /*
- * L.TileLayer.WMS is used for putting WMS tile layers on the map.
+ * L.TileLayer.WMS is used for WMS tile layers.
  */
 
 L.TileLayer.WMS = L.TileLayer.extend({
@@ -18,25 +18,21 @@ L.TileLayer.WMS = L.TileLayer.extend({
 
 		this._url = url;
 
-		var wmsParams = L.extend({}, this.defaultWmsParams),
-		    tileSize = options.tileSize || this.options.tileSize;
+		var wmsParams = L.extend({}, this.defaultWmsParams);
 
-		if (options.detectRetina && L.Browser.retina) {
-			wmsParams.width = wmsParams.height = tileSize * 2;
-		} else {
-			wmsParams.width = wmsParams.height = tileSize;
-		}
-
+		// all keys that are not TileLayer options go to WMS params
 		for (var i in options) {
-			// all keys that are not TileLayer options go to WMS params
 			if (!this.options.hasOwnProperty(i) && i !== 'crs') {
 				wmsParams[i] = options[i];
 			}
 		}
 
-		this.wmsParams = wmsParams;
+		options = L.setOptions(this, options);
 
-		L.setOptions(this, options);
+		wmsParams.width = wmsParams.height =
+				options.tileSize * (options.detectRetina && L.Browser.retina ? 2 : 1);
+
+		this.wmsParams = wmsParams;
 	},
 
 	onAdd: function (map) {
@@ -57,9 +53,9 @@ L.TileLayer.WMS = L.TileLayer.extend({
 		    nw = this._crs.project(tileBounds.getNorthWest()),
 		    se = this._crs.project(tileBounds.getSouthEast()),
 
-		    bbox = this._wmsVersion >= 1.3 && this._crs === L.CRS.EPSG4326 ?
-		        [se.y, nw.x, nw.y, se.x].join(',') :
-		        [nw.x, se.y, se.x, nw.y].join(','),
+		    bbox = (this._wmsVersion >= 1.3 && this._crs === L.CRS.EPSG4326 ?
+		        [se.y, nw.x, nw.y, se.x] :
+		        [nw.x, se.y, se.x, nw.y]).join(','),
 
 		    url = L.Util.template(this._url, {s: this._getSubdomain(coords)});
 
