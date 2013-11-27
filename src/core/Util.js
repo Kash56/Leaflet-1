@@ -18,10 +18,17 @@ L.Util = {
 		return dest;
 	},
 
-	bind: function (fn, obj) { // (Function, Object) -> Function
-		var args = arguments.length > 2 ? Array.prototype.slice.call(arguments, 2) : null;
+	bind: function (fn, obj) {
+		var slice = Array.prototype.slice;
+
+		if (fn.bind) {
+			return fn.bind.apply(fn, slice.call(arguments, 1));
+		}
+
+		var args = arguments.length > 2 ? slice.call(arguments, 2) : null;
+
 		return function () {
-			return fn.apply(obj, args || arguments);
+			return fn.apply(obj, args ? args.concat(slice.call(arguments)) : arguments);
 		};
 	},
 
