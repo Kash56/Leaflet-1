@@ -53,8 +53,7 @@ L.TileLayer.WMS = L.TileLayer.extend({
 
 	getTileUrl: function (coords) {
 
-		var map = this._map,
-		    tileBounds = this._tileCoordsToBounds(coords),
+		var tileBounds = this._tileCoordsToBounds(coords),
 		    nw = this._crs.project(tileBounds.getNorthWest()),
 		    se = this._crs.project(tileBounds.getSouthEast()),
 
