@@ -391,6 +391,10 @@ L.Map = L.Class.extend({
 		return this._initialTopLeftPoint;
 	},
 
+	getWorldPixelSize: function () {
+		return this._map.options.crs.getSize(this._map.getZoom());
+	},
+
 	getPanes: function () {
 		return this._panes;
 	},
