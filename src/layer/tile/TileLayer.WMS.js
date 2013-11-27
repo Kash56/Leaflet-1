@@ -14,7 +14,7 @@ L.TileLayer.WMS = L.TileLayer.extend({
 		transparent: false
 	},
 
-	initialize: function (url, options) { // (String, Object)
+	initialize: function (url, options) {
 
 		this._url = url;
 
@@ -51,21 +51,18 @@ L.TileLayer.WMS = L.TileLayer.extend({
 		L.TileLayer.prototype.onAdd.call(this, map);
 	},
 
-	getTileUrl: function (tilePoint) { // (Point, Number) -> String
+	getTileUrl: function (coords) {
 
 		var map = this._map,
-		    tileSize = this.options.tileSize,
+		    tileBounds = this._tileCoordsToBounds(coords),
+		    nw = this._crs.project(tileBounds.getNorthWest()),
+		    se = this._crs.project(tileBounds.getSouthEast()),
 
-		    nwPoint = tilePoint.multiplyBy(tileSize),
-		    sePoint = nwPoint.add([tileSize, tileSize]),
-
-		    nw = this._crs.project(map.unproject(nwPoint, tilePoint.z)),
-		    se = this._crs.project(map.unproject(sePoint, tilePoint.z)),
 		    bbox = this._wmsVersion >= 1.3 && this._crs === L.CRS.EPSG4326 ?
 		        [se.y, nw.x, nw.y, se.x].join(',') :
 		        [nw.x, se.y, se.x, nw.y].join(','),
 
-		    url = L.Util.template(this._url, {s: this._getSubdomain(tilePoint)});
+		    url = L.Util.template(this._url, {s: this._getSubdomain(coords)});
 
 		return url + L.Util.getParamString(this.wmsParams, url, true) + '&BBOX=' + bbox;
 	},
