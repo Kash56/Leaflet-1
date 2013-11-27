@@ -399,7 +399,7 @@ L.GridLayer = L.Class.extend({
 		// we know that tile is async and will be ready later; otherwise
 		if (this.createTile.length < 2) {
 			// mark tile as ready, but delay one frame for opacity anim to happen
-			setTimeout(L.bind(this._tileReady, this, tile), 0);
+			setTimeout(L.bind(this._tileReady, this, null, tile), 0);
 		}
 
 		/*
@@ -416,7 +416,11 @@ L.GridLayer = L.Class.extend({
 		container.appendChild(tile);
 	},
 
-	_tileReady: function (tile) {
+	_tileReady: function (err, tile) {
+		if (err) {
+			this.fire('tileerror', {error: err});
+		}
+
 		L.DomUtil.addClass(tile, 'leaflet-tile-loaded');
 
 		this.fire('tileload', {tile: tile});
