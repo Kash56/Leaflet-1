@@ -23,9 +23,6 @@ L.TileLayer = L.GridLayer.extend({
 	initialize: function (url, options) {
 		options = L.setOptions(this, options);
 
-		this._tileOnLoad = L.bind(this._tileOnLoad, this);
-		this._tileOnError = L.bind(this._tileOnError, this);
-
 		// detecting retina displays, adjusting tileSize and zoom levels
 		if (options.detectRetina && L.Browser.retina && options.maxZoom > 0) {
 
@@ -63,8 +60,8 @@ L.TileLayer = L.GridLayer.extend({
 	createTile: function (coords, done) {
 		var tile = document.createElement('img');
 
-		tile.onload  = this._tileOnLoad;
-		tile.onerror = this._tileOnError;
+		tile.onload = L.bind(this._tileOnLoad, this);
+		tile.onerror = L.bind(this._tileOnError, this);
 
 		tile.src = this.getTileUrl(coords);
 

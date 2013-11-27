@@ -25,9 +25,6 @@ L.GridLayer = L.Class.extend({
 
 	initialize: function (options) {
 		options = L.setOptions(this, options);
-
-		// make sure it can be passed safely without losing context
-		this._tileReady = L.bind(this._tileReady, this);
 	},
 
 	onAdd: function (map) {
@@ -382,7 +379,7 @@ L.GridLayer = L.Class.extend({
 
 		this._wrapCoords(coords);
 
-		var tile = this.createTile(coords, this._tileReady);
+		var tile = this.createTile(coords, L.bind(this._tileReady, this));
 
 		this.fire('tileloadstart', {tile: tile});
 
